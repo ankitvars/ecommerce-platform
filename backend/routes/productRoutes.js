@@ -5,7 +5,6 @@ const auth = require("../middleware/auth");
 
 // Create Product
 router.post("/", auth, async (req, res) => {
-  console.log(req.body, "request");
   const { name, description, price, imageUrl } = req.body;
 
   try {
@@ -67,13 +66,10 @@ router.put("/:id", auth, async (req, res) => {
 // Delete Product
 router.delete("/:id", auth, async (req, res) => {
   try {
-    let product = await Product.findById(req.params.id);
-    if (!product) {
+    const result = await Product.deleteOne({ _id: req.params.id });
+    if (result.deletedCount === 0) {
       return res.status(404).json({ message: "Product not found" });
     }
-
-    // Delete product from database
-    await product.remove();
 
     res.json({ message: "Product deleted successfully" });
   } catch (error) {
@@ -81,5 +77,7 @@ router.delete("/:id", auth, async (req, res) => {
     res.status(500).json({ message: "Server Error" });
   }
 });
+
+
 
 module.exports = router;

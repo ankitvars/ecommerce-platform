@@ -1,17 +1,8 @@
 import { useState } from "react";
 import Navbar from "../components/Navbar";
 import NewArrivals from "@/components/NewArrivals";
-import AddProductModal from "@/components/AddProductModal";
 
 const Home = () => {
-  const [isModalOpen, setModalOpen] = useState(false);
-  const [products, setProducts] = useState([]);
-
-  const handleAddProduct = (product) => {
-    // Add the new product to the state
-    setProducts([...products, product]);
-  };
-
   return (
     <div className="flex flex-col min-h-screen">
       <Navbar />
@@ -25,14 +16,6 @@ const Home = () => {
               Discover the latest trends and shop your favorite products with
               ease.
             </p>
-            <div className="flex justify-end mb-4">
-              <button
-                onClick={() => setModalOpen(true)}
-                className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-              >
-                Add Product
-              </button>
-            </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <div className="bg-white rounded-lg shadow-md p-6">
                 <h2 className="text-xl font-semibold text-gray-800 mb-4">
@@ -66,12 +49,6 @@ const Home = () => {
           </div>
         </div>
       </footer>
-
-      <AddProductModal
-        isOpen={isModalOpen}
-        onClose={() => setModalOpen(false)}
-        onAddProduct={handleAddProduct}
-      />
     </div>
   );
 };

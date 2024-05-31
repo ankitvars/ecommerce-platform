@@ -35,7 +35,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
       );
 
       if (res.status === 201) {
-        toast.success(res.message);
+        // toast.success(res.message);
         onAddProduct(res.data.product);
         onClose();
       } else {
