@@ -1,4 +1,3 @@
-// components/AddProductModal.js
 import { useState } from "react";
 import axios from "axios";
 
@@ -35,7 +34,6 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
       );
 
       if (res.status === 201) {
-        // toast.success(res.message);
         onAddProduct(res.data.product);
         onClose();
       } else {
@@ -50,7 +48,7 @@ const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
 
   return (
     <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
-      <div className="bg-white p-8 rounded shadow-md w-1/3">
+      <div className="bg-white p-8 rounded shadow-md md:w-2/3 lg:w-1/2 xl:w-1/3">
         <h2 className="text-2xl font-bold mb-4">Add New Product</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">

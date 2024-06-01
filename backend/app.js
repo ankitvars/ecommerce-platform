@@ -2,7 +2,6 @@ const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const authMiddleware = require("./middleware/auth");
 
 dotenv.config();
 
@@ -14,12 +13,9 @@ app.use(express.json());
 
 // Database Connection
 mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
+  .connect("mongodb://localhost:27017/mydatabase")
   .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.error(err));
+  .catch((err) => console.error("MongoDB connection error:", err));
 
 // Routes
 app.use("/api/users", require("./routes/userRoutes"));

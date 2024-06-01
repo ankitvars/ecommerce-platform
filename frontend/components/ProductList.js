@@ -1,4 +1,4 @@
-import Link from "next/link";
+import axios from "axios";
 import AddProductModal from "@/components/AddProductModal";
 import { useState } from "react";
 import EditProductModal from "@/components/EditProductModal";
@@ -9,15 +9,46 @@ const ProductList = ({ products, setProducts, fetchProducts }) => {
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [searchQuery, setSearchQuery] = useState("");
 
+  const handleSearch = async () => {
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.get(
+        `http://localhost:5000/api/products?search=${searchQuery}`,
+        {
+          headers: {
+            "Content-Type": "application/json",
+            "x-auth-token": token,
+          },
+        }
+      );
+      setProducts(res.data);
+    } catch (error) {
+      console.error("Failed to search products:", error);
+    }
+  };
   return (
     <>
       <div className="container mx-auto mt-8">
         <h1 className="text-3xl font-bold mb-4 text-center">Products List</h1>
         <div className="flex justify-end mb-4">
+          <input
+            type="text"
+            placeholder="Search products..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="border border-gray-300 px-4 py-2 rounded-lg mr-2 focus:ring-1 "
+          />
+          <button
+            onClick={handleSearch}
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          >
+            Search
+          </button>
           <button
             onClick={() => setModalOpen(true)}
-            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+            className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 ml-2"
           >
             Add Product
           </button>
