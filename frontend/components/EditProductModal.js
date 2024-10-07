@@ -16,7 +16,7 @@ const EditProductModal = ({ isOpen, onClose, product, onUpdateProduct }) => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.put(
-        `http://localhost:5000/api/products/${updatedProduct._id}`,
+        `http://localhost:5001/api/products/${updatedProduct._id}`,
         updatedProduct,
         {
           headers: {
@@ -36,7 +36,7 @@ const EditProductModal = ({ isOpen, onClose, product, onUpdateProduct }) => {
       console.error("Failed to update product:", error.response.data.message);
     }
   };
-    
+
   useEffect(() => {
     setUpdatedProduct({ ...product });
   }, [product]);

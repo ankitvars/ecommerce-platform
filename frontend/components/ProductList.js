@@ -15,7 +15,7 @@ const ProductList = ({ products, setProducts, fetchProducts }) => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.get(
-        `http://localhost:5000/api/products?search=${searchQuery}`,
+        `http://localhost:5001/api/products?search=${searchQuery}`,
         {
           headers: {
             "Content-Type": "application/json",

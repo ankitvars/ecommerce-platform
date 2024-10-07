@@ -1,142 +1,144 @@
+import {
+  Modal,
+  Box,
+  TextField,
+  Button,
+  Typography,
+  CircularProgress,
+} from "@mui/material";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
 import { useState } from "react";
 import axios from "axios";
+import { toast } from "sonner"; // Assuming you're using Sonner for notifications
+
+// Validation schema using Zod
+const schema = z.object({
+  name: z.string().min(2, "Name must be at least 2 characters"),
+  description: z.string().min(10, "Description must be at least 10 characters"),
+  price: z.preprocess(
+    (value) => Number(value),
+    z.number().positive("Price must be a positive number")
+  ),
+  imageUrl: z.string().url("Please enter a valid image URL"),
+});
 
 const AddProductModal = ({ isOpen, onClose, onAddProduct }) => {
-  const [product, setProduct] = useState({
-    name: "",
-    description: "",
-    price: "",
-    imageUrl: "",
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm({
+    resolver: zodResolver(schema),
   });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setProduct((prevProduct) => ({
-      ...prevProduct,
-      [name]: value,
-    }));
-  };
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const onSubmit = async (data) => {
+    setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.post(
-        "http://localhost:5000/api/products",
-        product,
-        {
-          headers: {
-            "Content-Type": "application/json",
-            "x-auth-token": token,
-          },
-        }
-      );
+      const res = await axios.post("http://localhost:5001/api/products", data, {
+        headers: {
+          "Content-Type": "application/json",
+          "x-auth-token": token,
+        },
+      });
 
       if (res.status === 201) {
         onAddProduct(res.data.product);
         onClose();
+        reset(); // Reset form after successful submission
+        toast.success("Product added successfully!");
       } else {
         console.error("Failed to add product:", res.data.message);
+        toast.error("Failed to add product");
       }
     } catch (error) {
-      console.error("Failed to add product:", error.response.data.message);
+      console.error("Failed to add product:", error.response?.data?.message);
+      toast.error("Failed to add product");
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-0 bg-gray-800 bg-opacity-75 flex justify-center items-center">
-      <div className="bg-white p-8 rounded shadow-md md:w-2/3 lg:w-1/2 xl:w-1/3">
-        <h2 className="text-2xl font-bold mb-4">Add New Product</h2>
-        <form onSubmit={handleSubmit}>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="name"
-            >
-              Product Name
-            </label>
-            <input
-              type="text"
-              name="name"
-              id="name"
-              value={product.name}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="description"
-            >
-              Description
-            </label>
-            <input
-              type="text"
-              name="description"
-              id="description"
-              value={product.description}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="price"
-            >
-              Price
-            </label>
-            <input
-              type="number"
-              name="price"
-              id="price"
-              value={product.price}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label
-              className="block text-gray-700 text-sm font-bold mb-2"
-              htmlFor="imageUrl"
-            >
-              Image URL
-            </label>
-            <input
-              type="text"
-              name="imageUrl"
-              id="imageUrl"
-              value={product.imageUrl}
-              onChange={handleChange}
-              className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-              required
-            />
-          </div>
-          <div className="flex items-center justify-between">
-            <button
+    <Modal open={isOpen} onClose={onClose}>
+      <Box
+        sx={{
+          position: "absolute",
+          top: "50%",
+          left: "50%",
+          transform: "translate(-50%, -50%)",
+          width: 600, // Increased width to 600px
+          bgcolor: "background.paper",
+          boxShadow: 24,
+          p: 4,
+          borderRadius: "8px",
+        }}
+      >
+        <Typography variant="h5" component="h2" fontWeight="bold" mb={2}>
+          Add New Product
+        </Typography>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <TextField
+            fullWidth
+            label="Product Name"
+            {...register("name")}
+            error={!!errors.name}
+            helperText={errors.name?.message}
+            margin="normal"
+            variant="outlined"
+          />
+          <TextField
+            fullWidth
+            label="Description"
+            {...register("description")}
+            error={!!errors.description}
+            helperText={errors.description?.message}
+            margin="normal"
+            variant="outlined"
+            multiline
+            rows={3}
+          />
+          <TextField
+            fullWidth
+            label="Price"
+            type="number"
+            {...register("price", { valueAsNumber: true })}
+            error={!!errors.price}
+            helperText={errors.price?.message}
+            margin="normal"
+            variant="outlined"
+          />
+          <TextField
+            fullWidth
+            label="Image URL"
+            {...register("imageUrl")}
+            error={!!errors.imageUrl}
+            helperText={errors.imageUrl?.message}
+            margin="normal"
+            variant="outlined"
+          />
+          <Box mt={3} display="flex" justifyContent="space-between">
+            <Button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              variant="contained"
+              color="primary"
+              disabled={loading}
+              startIcon={loading && <CircularProgress size={20} />}
             >
-              Add Product
-            </button>
-            <button
-              type="button"
-              onClick={onClose}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
+              {loading ? "Adding..." : "Add Product"}
+            </Button>
+            <Button onClick={onClose} variant="outlined" color="secondary">
               Cancel
-            </button>
-          </div>
+            </Button>
+          </Box>
         </form>
-      </div>
-    </div>
+      </Box>
+    </Modal>
   );
 };
 

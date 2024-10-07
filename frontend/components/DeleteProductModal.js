@@ -6,7 +6,7 @@ const DeleteProductModal = ({ isOpen, onClose, onDeleteProduct, product }) => {
     try {
       const token = localStorage.getItem("token");
       const res = await axios.delete(
-        `http://localhost:5000/api/products/${product._id}`,
+        `http://localhost:5001/api/products/${product._id}`,
         {
           headers: {
             "Content-Type": "application/json",

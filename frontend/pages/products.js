@@ -10,7 +10,7 @@ const Products = () => {
   const fetchProducts = async () => {
     try {
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/products", {
+      const response = await axios.get("http://localhost:5001/api/products", {
         headers: {
           "Content-Type": "application/json",
           "x-auth-token": token,
